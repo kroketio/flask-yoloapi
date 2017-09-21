@@ -31,7 +31,6 @@ Whoa, that was easy! Let's look at the response:
 
 ```javascript
 {
-    status: true,
     data: "user logged in!"
 }
 ```
@@ -60,7 +59,6 @@ This error response is also generated when endpoint requirements are not met.
 
 ```javascript
 {
-    status: false,
     data: "argument 'password' is required",
     docstring: {
         help: "Logs the user in.",
@@ -91,7 +89,6 @@ def shopping_list(category):
 
 ```javascript
 {
-    "status": true
     "data": [
         "volvo xc60", 
         "mclaren mp4-12c"
@@ -127,7 +124,6 @@ def hello(name, age):
 
 ```javascript
 {
-    "status": true,
     "data": {
         "age": 27, 
         "name": "sander"
@@ -150,7 +146,6 @@ def hello(name, age):
 `/hello/sander`
 ```javascript
 {
-    "status": true,
     "data": {
         "age": 10, 
         "name": "sander"
@@ -181,8 +176,7 @@ def hello(name, age):
 
 ```javascript
 {
-    "data": "parameter 'age' error: you can't possibly be that old!", 
-    "status": false
+    "data": "parameter 'age' error: you can't possibly be that old!"
 }
 ```
 

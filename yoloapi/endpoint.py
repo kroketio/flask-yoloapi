@@ -22,10 +22,9 @@ def api(view_func, *parameters):
                             "HTTP return status code as an integer"
     }
 
-    func_err = lambda ex, http_status=500: (jsonify({
-        "status": False,
-        "data": str(ex),
-        "docstring": docstring(view_func, *parameters)}
+    func_err = lambda ex, http_status=500: (jsonify(
+        data=str(ex),
+        docstring=docstring(view_func, *parameters)
     ), http_status)
 
     @wraps(view_func)
@@ -73,18 +72,18 @@ def api(view_func, *parameters):
             return func_err("view function returned an error: %s" % str(ex))
 
         if result is None:
-            return jsonify({"status": True, "data": None}), 204
+            return jsonify(data=None), 204
 
         # if view function returned a tuple, do http status code
         elif isinstance(result, tuple):
             if not len(result) == 2 or not isinstance(result[1], int):
                 return func_err(messages["bad_return_tuple"])
-            return jsonify({"status": True, "data": result[0]}), result[1]
+            return jsonify(data=result[0]), result[1]
 
         elif not isinstance(result, SUPPORTED_TYPES):
             raise Exception("Bad return type for api_result")
 
-        return jsonify({"status": True, "data": result})
+        return jsonify(data=result)
     return validate_and_execute
 
 
