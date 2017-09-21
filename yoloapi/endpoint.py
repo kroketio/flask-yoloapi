@@ -61,8 +61,6 @@ def api(view_func, *parameters):
 
             # validate via custom validator, if provided
             if 'validator' in param.kwargs:
-                if not callable(param.kwargs['validator']):
-                    raise Exception('validator argument must be a function')
                 try:
                     param.kwargs['validator'](value)
                 except Exception as ex:
@@ -93,13 +91,15 @@ def api(view_func, *parameters):
 class parameter:
     def __init__(self, key, type, default=None, required=False, validator=None):
         if not isinstance(key, (str, unicode)):
-            raise Exception("bad type for key; must be 'str'")
+            raise Exception("bad type for 'key'; must be 'str'")
         if not isinstance(required, bool):
-            raise Exception("bad type for required; must be 'bool'")
+            raise Exception("bad type for 'required'; must be 'bool'")
         if not issubclass(type, SUPPORTED_TYPES):
             raise Exception("parameter type '%s' not supported" % str(type))
         if default is not None and default.__class__ not in SUPPORTED_TYPES:
             raise Exception("parameter default of type '%s' not supported" % str(type(default)))
+        if validator is not None and not callable(validator):
+            raise Exception("parameter 'validator' must be a function")
 
         self.kwargs = {"validator": validator}
         self.default = default
