@@ -8,17 +8,6 @@ What is YoloAPI?
 ----------------
 YoloAPI is a clean way to enforce parameter requirements to Flask app routes. 
 
-Use cases
--------------
-
-- You don't want to fish incoming parameters out of `request.args`, or wait, was it `request.form`? No, it is `request.json`. Ugh!
-    - (Even if you do manage to extract them out of the `request` object, you then need to check their validity on type and value)
-- You don't want to write boilerplate code that involves classes just to make some API routes (flask-restful).
-- You don't need to hook your endpoints directly to SQLa models.
-- You don't care about providing REST compliancy - you just want a JSON endpoint, damnit!
-
-In short, this is a simple library for simple JSON endpoints.
-
 Example
 -------
 
@@ -51,6 +40,18 @@ Whoa, that was easy! Let's look at the response:
 }
 ```
 
+Use cases
+-------------
+
+- You don't want to fish incoming parameters out of `request.args`, or wait, was it `request.form`? No, it is `request.json`. Ugh!
+    - (Even if you do manage to extract them out of the `request` object, you then need to check their validity on type and value)
+- You don't want to write boilerplate code that involves classes just to make some API routes (flask-restful).
+- You don't need to hook your endpoints directly to SQLa models.
+- You don't care about providing REST compliancy - you just want a JSON endpoint, damnit!
+
+In short, this is a simple library for simple JSON endpoints.
+
+
 ## Error handling
 
 When the view function itself raises an exception, a JSON response is generated that includes:
@@ -67,6 +68,7 @@ This error response is also generated when endpoint requirements are not met.
     data: "argument 'password' is required",
     docstring: {
         help: "Logs the user in.",
+        return: "The logged in message!",
         params: {
             username: {
                 help: "The username of the user",
@@ -74,19 +76,7 @@ This error response is also generated when endpoint requirements are not met.
                 type: "str"
                 }
             },
-            password: {
-                help: "The password of the user",
-                required: true,
-                type: "str"
-            },
-            expiration: {
-                help: "Session expiration time in seconds",
-                required: false,
-                type: "bool"
-            }
-        return: "The logged in message!"
-    }
-}
+        ...
 ```
 
 ## Return values
