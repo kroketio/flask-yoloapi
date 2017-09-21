@@ -27,7 +27,7 @@ def login(username, password, remember):
     return "user logged in!"
 ```
 
-Whoa, that was easy! Let's look at the response:
+The response:
 
 ```javascript
 {
@@ -38,11 +38,11 @@ Whoa, that was easy! Let's look at the response:
 Use cases
 -------------
 
-- You don't want to fish incoming parameters out of `request.args`, or wait, was it `request.form`? No, it is `request.json`. Ugh!
-    - (Even if you do manage to extract them out of the `request` object, you then need to check their validity on type and value)
 - You don't want to write boilerplate code that involves classes just to make some API routes (flask-restful).
+- You don't want to fish incoming parameters out of `request.args`, or wait, was it `request.form`? No, `request.json` :sleeping:
+    - (Even if you do manage to extract them out of the `request` object, you then need to check their validity on type and value)
 - You don't need to hook your endpoints directly to SQLa models.
-- You don't care about providing REST compliancy - you just want a JSON endpoint, damnit!
+- You don't care about providing REST compliancy - you just want somewhat consistent JSON endpoints, damnit!
 
 In short, this is a simple library for simple JSON endpoints.
 
@@ -83,7 +83,7 @@ In the example above, a string was returned. The following types are also suppor
 @endpoint.api(
     parameter('category', type=str, required=False)
 )
-def shopping_list(category):
+def wishlist(category):
     return ['volvo xc60', 'mclaren mp4-12c']
 ```
 
@@ -133,7 +133,7 @@ def hello(name, age):
 
 ## Default values
 
-You can define default values to endpoint parameters by giving them a `default` argument.
+You can define default values for endpoint parameters via `default`.
 
 ```python
 @app.route('/hello/<name>')
@@ -155,7 +155,7 @@ def hello(name, age):
 
 ## Custom validators
 
-Additional parameter validation can be done by providing the `validator` argument. 
+Additional parameter validation can be done by providing a validator function. 
 
 This function takes 1 parameter; the input. An `Exception` must be raised when the validation proves to be unsuccessful.
 
