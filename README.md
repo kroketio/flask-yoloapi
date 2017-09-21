@@ -164,7 +164,7 @@ def hello(name, age):
 
 ## Custom validators
 
-Additional parameter validation can be done by providing a function to the `validator` argument. 
+Additional parameter validation can be done by providing the `validator` argument. 
 
 This function takes 1 parameter; the input. An `Exception` must be raised when the validation proves to be unsuccessful.
 
@@ -197,6 +197,24 @@ This library is rather opportunistic about gathering incoming parameters, as it 
 - `request.args`
 - `request.json`
 - `request.form`
+
+## Datetime format
+
+To output datetime objects in `ISO 8601` format, which are trivial to parse in Javascript via `Date.parse()`), use a custom JSON encoder.
+
+```python
+from datetime import date
+from flask.json import JSONEncoder
+
+class ApiJsonEncoder(JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, (date, datetime)):
+            return obj.isoformat()
+        return super(ApiJsonEncoder, self).default(obj)
+
+app = Flask(__name__)
+app.json_encoder = CustomJSONEncoder
+```
 
 License
 -------------
