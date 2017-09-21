@@ -23,9 +23,9 @@ def api(view_func, *parameters):
     }
 
     func_err = lambda ex, http_status=500: (jsonify({
-        'status': False,
-        'data': str(ex),
-        'docstring': docstring(view_func, *parameters)}
+        "status": False,
+        "data": str(ex),
+        "docstring": docstring(view_func, *parameters)}
     ), http_status)
 
     @wraps(view_func)
@@ -37,7 +37,7 @@ def api(view_func, *parameters):
             # checks if param is required
             if param.key not in request_data:
                 if param.required:
-                    return func_err(messages['required'] % param.key)
+                    return func_err(messages["required"] % param.key)
                 else:
                     # set default value, if provided
                     if param.default is not None:
@@ -53,16 +53,16 @@ def api(view_func, *parameters):
                     try:
                         value = param.type(value)  # opportunistic coercing to int/float
                     except ValueError:
-                        return func_err(messages['type_error'] % (param.key, param.type))
+                        return func_err(messages["type_error"] % (param.key, param.type))
                 elif issubclass(param.type, (str, unicode)):
                     pass
                 else:
-                    return func_err(messages['type_error'] % (param.key, param.type))
+                    return func_err(messages["type_error"] % (param.key, param.type))
 
             # validate via custom validator, if provided
-            if 'validator' in param.kwargs:
+            if "validator" in param.kwargs:
                 try:
-                    param.kwargs['validator'](value)
+                    param.kwargs["validator"](value)
                 except Exception as ex:
                     return func_err("parameter '%s' error: %s" % (param.key, str(ex)))
 
@@ -70,21 +70,21 @@ def api(view_func, *parameters):
         try:
             result = view_func(*args, **kwargs)
         except Exception as ex:
-            return func_err('view function returned an error: %s' % str(ex))
+            return func_err("view function returned an error: %s" % str(ex))
 
         if result is None:
-            return jsonify({'status': True, 'data': None}), 204
+            return jsonify({"status": True, "data": None}), 204
 
         # if view function returned a tuple, do http status code
         elif isinstance(result, tuple):
             if not len(result) == 2 or not isinstance(result[1], int):
-                return func_err(messages['bad_return_tuple'])
-            return jsonify({'status': True, 'data': result[0]}), result[1]
+                return func_err(messages["bad_return_tuple"])
+            return jsonify({"status": True, "data": result[0]}), result[1]
 
         elif not isinstance(result, SUPPORTED_TYPES):
-            raise Exception('Bad return type for api_result')
+            raise Exception("Bad return type for api_result")
 
-        return jsonify({'status': True, 'data': result})
+        return jsonify({"status": True, "data": result})
     return validate_and_execute
 
 
