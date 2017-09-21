@@ -2,11 +2,7 @@
 
 ![whoop](https://i.imgur.com/xVS3UGq.png)
 
-Tired of dealing with overly complicated API libraries for Flask? You've come to the right place!!
-
-What is YoloAPI?
-----------------
-YoloAPI is a clean way to enforce parameter requirements to Flask app routes. 
+A simple framework for creating clean Flask API endpoints.
 
 Example
 -------
@@ -18,9 +14,9 @@ from flask_yoloapi import endpoint, parameter
 @endpoint.api(
     parameter('username', type=str, required=True),
     parameter('password', type=str, required=True),
-    parameter('remember', type=bool, required=False)
+    parameter('remember', type=bool, required=False, default=False)
 )
-def login(username, password, remember=False):
+def login(username, password, remember):
     """
     Logs the user in.
     :param username: The username of the user
@@ -200,7 +196,7 @@ This library is rather opportunistic about gathering incoming parameters, as it 
 
 ## Datetime format
 
-To output datetime objects in `ISO 8601` format, which are trivial to parse in Javascript via `Date.parse()`), use a custom JSON encoder.
+To output datetime objects in `ISO 8601` format (which are trivial to parse in Javascript via `Date.parse()`), use a custom JSON encoder.
 
 ```python
 from datetime import date
