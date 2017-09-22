@@ -1,20 +1,30 @@
+import sys
+import inspect
 from functools import wraps
 from datetime import datetime
 
 from flask import jsonify
 
-from yoloapi.utils import decorator_parametrized, docstring, get_request_data
+from yoloapi import utils
 
-SUPPORTED_TYPES = (int, float, str, list, dict, unicode, datetime, None)
+SUPPORTED_TYPES = (int, float, str, list, dict, datetime, None)
+if not sys.version_info >= (3, 0):
+    STRING_LIKE = (unicode, str)
+    SUPPORTED_TYPES += (unicode,)
+else:
+    STRING_LIKE = (str,)
 
 
-@decorator_parametrized
+@utils.decorator_parametrized
 def api(view_func, *parameters):
     """YOLO!"""
     messages = {
         "required": "argument '%s' is required",
-        "type_error": "wrong type for argument '%s' "
+        "type_error": "wrong type for argument '%s', "
                       "should be of type '%s'",
+        "type_required_py3.5": "no type specified for parameter '%s', "
+                               "specify a type argument or use "
+                               "type annotations (PEP 484)",
         "bad_return": "view function returned unsupported type '%s'",
         "bad_return_tuple": "when returning tuples, the first index "
                             "must be an object of any supported "
@@ -24,13 +34,22 @@ def api(view_func, *parameters):
 
     func_err = lambda ex, http_status=500: (jsonify(
         data=str(ex),
-        docstring=docstring(view_func, *parameters)
+        docstring=utils.docstring(view_func, *parameters)
     ), http_status)
 
     @wraps(view_func)
     def validate_and_execute(*args, **kwargs):
         # grabs incoming data (multiple methods)
-        request_data = get_request_data()
+        request_data = utils.get_request_data()
+
+        # fall-back type annotations from function signatures
+        # when no parameter type is specified (python >3.5 only)
+        type_annotations = None
+        if sys.version_info >= (3, 5):
+            signature = inspect.signature(view_func)
+            type_annotations = {k: v.annotation for k, v in
+                                signature.parameters.items()
+                                if v.annotation is not inspect._empty}
 
         for param in parameters:
             # checks if param is required
@@ -45,6 +64,13 @@ def api(view_func, *parameters):
                         kwargs[param.key] = None
                     continue
 
+            # set the param type from function annotation (runs only once)
+            if type_annotations and param.type is None:
+                if param.key in type_annotations:
+                    param.type = type_annotations[param.key]
+                else:
+                    return func_err(messages["type_required_py3.5"] % param.key)
+
             # validate the param value
             value = request_data.get(param.key)
             if type(value) != param.type:
@@ -53,7 +79,7 @@ def api(view_func, *parameters):
                         value = param.type(value)  # opportunistic coercing to int/float
                     except ValueError:
                         return func_err(messages["type_error"] % (param.key, param.type))
-                elif issubclass(param.type, (str, unicode)):
+                elif issubclass(param.type, STRING_LIKE):
                     pass
                 else:
                     return func_err(messages["type_error"] % (param.key, param.type))
@@ -81,22 +107,26 @@ def api(view_func, *parameters):
             return jsonify(data=result[0]), result[1]
 
         elif not isinstance(result, SUPPORTED_TYPES):
-            raise Exception("Bad return type for api_result")
+            raise TypeError("Bad return type for api_result")
 
         return jsonify(data=result)
     return validate_and_execute
 
 
 class parameter:
-    def __init__(self, key, type, default=None, required=False, validator=None):
-        if not isinstance(key, (str, unicode)):
-            raise Exception("bad type for 'key'; must be 'str'")
+    def __init__(self, key, type=None, default=None, required=False, validator=None):
+        if not isinstance(key, STRING_LIKE):
+            raise TypeError("bad type for 'key'; must be 'str'")
         if not isinstance(required, bool):
-            raise Exception("bad type for 'required'; must be 'bool'")
-        if not issubclass(type, SUPPORTED_TYPES):
-            raise Exception("parameter type '%s' not supported" % str(type))
+            raise TypeError("bad type for 'required'; must be 'bool'")
+        if type is not None:
+            if not issubclass(type, SUPPORTED_TYPES):
+                raise TypeError("parameter type '%s' not supported" % str(type))
+        else:
+            if not sys.version_info >= (3, 0):
+                raise TypeError("parameter with key '%s' missing 1 required argument: 'type'" % key)
         if default is not None and default.__class__ not in SUPPORTED_TYPES:
-            raise Exception("parameter default of type '%s' not supported" % str(type(default)))
+            raise TypeError("parameter default of type '%s' not supported" % str(type(default)))
         if validator is not None and not callable(validator):
             raise Exception("parameter 'validator' must be a function")
 
@@ -104,4 +134,5 @@ class parameter:
         self.default = default
         self.key = str(key)
         self.type = type
+        self.type_annotations = None
         self.required = required
