@@ -153,6 +153,36 @@ def hello(name, age):
 }
 ```
 
+## Type annotations
+
+Parameter types are required, except when type annotations are in use.
+
+A Python 3.5 example:
+
+```python
+@app.route('/hello/', methods=['POST'])
+@endpoint.api(
+    parameter('age', required=True),
+    parameter('name', required=True)
+)
+def hello(name: str, age: int):
+    return {'name': name, 'age': age}
+```
+
+Python 2 equivalent:
+
+```python
+@app.route('/hello/', methods=['POST'])
+@endpoint.api(
+    parameter('age', type=int, required=True),
+    parameter('name', type=str, required=True)
+)
+def hello(name, age):
+    return {'name': name, 'age': age}
+```
+
+Note that type annotations are only supported from Python 3.5 and upwards (PEP 484).
+
 ## Custom validators
 
 Additional parameter validation can be done by providing a validator function. 
