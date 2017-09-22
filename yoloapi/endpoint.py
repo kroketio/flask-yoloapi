@@ -6,13 +6,21 @@ from datetime import datetime
 from flask import jsonify
 
 from yoloapi import utils
+from yoloapi.types import ANY
 
-SUPPORTED_TYPES = (int, float, str, list, dict, datetime, None)
-if not sys.version_info >= (3, 0):
-    STRING_LIKE = (unicode, str)
-    SUPPORTED_TYPES += (unicode,)
-else:
+SUPPORTED_TYPES = (list, dict, datetime, None, ANY)
+if sys.version_info >= (3, 0):
+    NUMERIC_TYPES = (int, float)
     STRING_LIKE = (str,)
+
+    SUPPORTED_TYPES += STRING_LIKE
+    SUPPORTED_TYPES += NUMERIC_TYPES
+else:
+    STRING_LIKE = (unicode, str)
+    NUMERIC_TYPES = (int, float, long)
+
+    SUPPORTED_TYPES += STRING_LIKE
+    SUPPORTED_TYPES += NUMERIC_TYPES
 
 
 @utils.decorator_parametrized
@@ -74,18 +82,20 @@ def api(view_func, *parameters):
             # validate the param value
             value = request_data.get(param.key)
             if type(value) != param.type:
-                if issubclass(param.type, (int, float)):
+                if param.type in NUMERIC_TYPES:
                     try:
-                        value = param.type(value)  # opportunistic coercing to int/float
+                        value = param.type(value)  # opportunistic coercing to int/float/long
                     except ValueError:
                         return func_err(messages["type_error"] % (param.key, param.type))
-                elif issubclass(param.type, STRING_LIKE):
+                elif param.type in STRING_LIKE:
+                    pass
+                elif param.type is ANY:
                     pass
                 else:
                     return func_err(messages["type_error"] % (param.key, param.type))
 
             # validate via custom validator, if provided
-            if "validator" in param.kwargs:
+            if param.kwargs.get('validator', None):
                 try:
                     param.kwargs["validator"](value)
                 except Exception as ex:
@@ -120,7 +130,7 @@ class parameter:
         if not isinstance(required, bool):
             raise TypeError("bad type for 'required'; must be 'bool'")
         if type is not None:
-            if not issubclass(type, SUPPORTED_TYPES):
+            if type not in SUPPORTED_TYPES:
                 raise TypeError("parameter type '%s' not supported" % str(type))
         else:
             if not sys.version_info >= (3, 0):
