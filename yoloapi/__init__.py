@@ -1,2 +1,3 @@
-import endpoint
-from endpoint import parameter
+import yoloapi.endpoint
+from yoloapi.endpoint import parameter
+

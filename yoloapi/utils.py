@@ -1,9 +1,12 @@
 from flask import request
 
+from yoloapi.exceptions import UnknownParameterType
+
 
 def docstring(view_func, *parameters):
-    """Takes a view function, generates an object out of the docstring"""
-    _docstring = view_func.func_doc
+    """Takes a view function, generates an object out of
+    the docstring"""
+    _docstring = view_func.__doc__
     if not _docstring:
         return
 
@@ -20,11 +23,28 @@ def docstring(view_func, *parameters):
             k, v = line[7:].split(': ', 1)
 
             try:
-                param = next({"type": param.type.__name__,
-                              "required": param.required}
-                             for param in parameters if param.key == k)
+                param = next(param for param in parameters if param.key == k)
+                required = param.required if param.required else False
+
+                if param.type is None:
+                    raise UnknownParameterType()
+
+                param = {
+                    "type": param.type.__name__,
+                    "required": required
+                }
             except StopIteration:
-                param = {"type": None, "required": None}
+                param = {
+                    "type": None,
+                    "required": False,
+                    "error": "docstring doesnt include this param"
+                }
+            except UnknownParameterType:
+                param = {
+                    "type": None,
+                    "required": required,
+                    "error": "could not determine type"
+                }
 
             param["help"] = v
             data["params"][k] = param
