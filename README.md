@@ -2,7 +2,7 @@
 
 ![whoop](https://i.imgur.com/xVS3UGq.png)
 
-A simple framework for creating clean Flask API endpoints.
+A small framework for creating simple JSON endpoints.
 
 Example
 -------
@@ -40,38 +40,11 @@ Use cases
 
 - You don't want to write boilerplate code that involves classes just to make some API routes (flask-restful).
 - You don't want to fish incoming parameters out of `request.args`, or wait, was it `request.form`? No, `request.json` :sleeping:
-    - (Even if you do manage to extract them out of the `request` object, you then need to check their validity on type and value)
 - You don't need to hook your endpoints directly to SQLa models.
 - You don't care about providing REST compliancy - you just want somewhat consistent JSON endpoints, damnit!
 
 In short, this is a simple library for simple JSON endpoints.
 
-
-## Error handling
-
-When the view function itself raises an exception, a JSON response is generated that includes:
-
-- The error message
-- Docstring of the view function
-- HTTP 500
-
-This error response is also generated when endpoint requirements are not met.
-
-```javascript
-{
-    data: "argument 'password' is required",
-    docstring: {
-        help: "Logs the user in.",
-        return: "The logged in message!",
-        params: {
-            username: {
-                help: "The username of the user",
-                required: true,
-                type: "str"
-                }
-            },
-        ...
-```
 
 ## Return values
 In the example above, a string was returned. The following types are also supported:
@@ -84,7 +57,8 @@ In the example above, a string was returned. The following types are also suppor
     parameter('category', type=str, required=False)
 )
 def wishlist(category):
-    return ['volvo xc60', 'mclaren mp4-12c']
+    if category == "cars":
+        return ['volvo xc60', 'mclaren mp4-12c']
 ```
 
 ```javascript
@@ -94,7 +68,7 @@ def wishlist(category):
         "mclaren mp4-12c"
     ]
 }
-```
+``` 
 
 ## HTTP status codes
 
@@ -185,9 +159,9 @@ Note that type annotations are only supported from Python 3.5 and upwards (PEP 4
 
 ## Custom validators
 
-Additional parameter validation can be done by providing a validator function. 
+Additional parameter validation can be done by providing a validator function. This function takes 1 parameter; the input. 
 
-This function takes 1 parameter; the input. An `Exception` must be raised when the validation proves to be unsuccessful.
+An `Exception` must be raised when the validation proves to be unsuccessful.
 
 ```python
 def custom_validator(value):
@@ -209,6 +183,8 @@ def hello(name, age):
     "data": "parameter 'age' error: you can't possibly be that old!"
 }
 ```
+
+If you need more flexibility regarding incoming types use the `yoloapi.types.ANY` type.
 
 ## Parameter handling
 
@@ -235,6 +211,34 @@ class ApiJsonEncoder(JSONEncoder):
 app = Flask(__name__)
 app.json_encoder = CustomJSONEncoder
 ```
+
+
+## Error handling
+
+When the view function itself raises an exception, a JSON response is generated that includes:
+
+- The error message
+- Docstring of the view function
+- HTTP 500
+
+This error response is also generated when endpoint requirements are not met.
+
+```javascript
+{
+    data: "argument 'password' is required",
+    docstring: {
+        help: "Logs the user in.",
+        return: "The logged in message!",
+        params: {
+            username: {
+                help: "The username of the user",
+                required: true,
+                type: "str"
+                }
+            },
+        ...
+```
+
 
 License
 -------------
