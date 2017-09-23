@@ -184,7 +184,7 @@ def hello(name, age):
 }
 ```
 
-If you need more flexibility regarding incoming types use the `yoloapi.types.ANY` type.
+If you need more flexibility regarding incoming types use the `flask_yoloapi.types.ANY` type.
 
 ## Parameter handling
 
@@ -209,7 +209,7 @@ class ApiJsonEncoder(JSONEncoder):
         return super(ApiJsonEncoder, self).default(obj)
 
 app = Flask(__name__)
-app.json_encoder = CustomJSONEncoder
+app.json_encoder = ApiJsonEncoder
 ```
 
 

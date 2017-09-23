@@ -1,6 +1,6 @@
 from flask import request
 
-from yoloapi.exceptions import UnknownParameterType
+from flask_yoloapi.exceptions import UnknownParameterType
 
 
 def docstring(view_func, *parameters):

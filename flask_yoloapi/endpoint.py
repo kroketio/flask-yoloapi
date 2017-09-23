@@ -5,8 +5,8 @@ from datetime import datetime
 
 from flask import jsonify
 
-from yoloapi import utils
-from yoloapi.types import ANY
+from flask_yoloapi import utils
+from flask_yoloapi.types import ANY
 
 SUPPORTED_TYPES = (list, dict, datetime, None, ANY)
 if sys.version_info >= (3, 0):
