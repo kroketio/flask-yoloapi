@@ -8,7 +8,7 @@ from flask import jsonify
 from flask_yoloapi import utils
 from flask_yoloapi.types import ANY
 
-SUPPORTED_TYPES = (list, dict, datetime, None, ANY)
+SUPPORTED_TYPES = (bool, list, dict, datetime, type(None), ANY)
 if sys.version_info >= (3, 0):
     NUMERIC_TYPES = (int, float)
     STRING_LIKE = (str,)
@@ -91,6 +91,13 @@ def api(view_func, *parameters):
                     pass
                 elif param.type is ANY:
                     pass
+                elif param.type is bool:
+                    if value == 'y':
+                        value = True
+                    elif value == 'n':
+                        value = False
+                    else:
+                        return func_err(messages["type_error"] % (param.key, param.type))
                 else:
                     return func_err(messages["type_error"] % (param.key, param.type))
 

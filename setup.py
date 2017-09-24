@@ -2,11 +2,11 @@ import os
 from setuptools import setup, find_packages
 
 
-version = '0.0.2'
+version = '0.0.3'
 README = os.path.join(os.path.dirname(__file__), 'README.md')
 long_description = open(README).read()
 setup(
-    name='flask-yoloapi',
+    name='Flask-YoloAPI',
     version=version,
     description='Simply the best Flask API library',
     long_description=long_description,
