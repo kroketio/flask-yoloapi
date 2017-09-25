@@ -20,7 +20,12 @@ def docstring(view_func, *parameters):
         line = line.strip()
 
         if line.startswith(":param "):
-            k, v = line[7:].split(': ', 1)
+            line = line[7:]
+            if ":" not in line:
+                continue
+
+            k, v = line.split(':', 1)
+            v = v.strip()
 
             try:
                 param = next(param for param in parameters if param.key == k)
