@@ -114,10 +114,10 @@ def api(view_func, *parameters):
         except Exception as ex:
             return func_err("view function returned an error: %s" % str(ex))
 
-        if result is None:
+        if isinstance(result, Response):
+            return result
+        elif result is None:
             return jsonify(data=None), 204
-
-        # if view function returned a tuple, do http status code
         elif isinstance(result, tuple):
             if not len(result) == 2 or not isinstance(result[1], int):
                 return func_err(messages["bad_return_tuple"])
