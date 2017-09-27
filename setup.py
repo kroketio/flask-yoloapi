@@ -2,7 +2,7 @@ import os
 from setuptools import setup, find_packages
 
 
-version = '0.0.5'
+version = '0.0.6'
 README = os.path.join(os.path.dirname(__file__), 'README.md')
 long_description = open(README).read()
 setup(
@@ -20,7 +20,7 @@ setup(
         'Topic :: Utilities',
         'Programming Language :: Python :: 2'
     ],
-    keywords='flask api flapi',
+    keywords='flask api flapi yoloapi',
     author='Sander Ferdinand',
     author_email='sa.ferdinand@gmail.com',
     url='https://github.com/skftn/flask-yoloapi',

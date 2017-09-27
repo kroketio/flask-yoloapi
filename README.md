@@ -49,7 +49,7 @@ In short, this is a simple library for simple JSON endpoints.
 ## Return values
 In the example above, a string was returned. The following types are also supported:
 
-- `str`, `unicode`, `int`, `float`, `dict`, `list`, `datetime`.
+- `str`, `unicode`, `int`, `float`, `dict`, `list`, `datetime`, `bool`, `flask.Response`.
 
 ```python
 @app.route('/wishlist')
@@ -77,7 +77,7 @@ To return different status codes, return a 2-length `tuple` with the second inde
 ```python
 @app.route('/create_foo')
 @endpoint.api()
-def view_function():
+def create_foo():
     return 'created', 201
 ```
 
@@ -193,6 +193,24 @@ This library is rather opportunistic about gathering incoming parameters, as it 
 - `request.args`
 - `request.json`
 - `request.form`
+
+An optional `location` argument can be given to control where to grab the incoming parameters from. 
+
+The following 3 locations are supported:
+
+- `args` - (GET parameters)
+- `form` - parameters submitted via HTTP form submission
+- `json` - parameters submitted via a JSON encoded HTTP request
+
+```python
+@app.route('/login')
+@endpoint.api(
+    parameter('username', type=str, location='form', required=True),
+    parameter('password', type=str, location='form', required=True),
+)
+def login(username, password):
+    return "Wrong password!", 403
+```
 
 ## Datetime format
 
