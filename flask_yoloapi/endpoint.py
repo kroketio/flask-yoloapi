@@ -3,24 +3,22 @@ import inspect
 from functools import wraps
 from datetime import datetime
 
-from flask import jsonify
+from flask import jsonify, Response
 
 from flask_yoloapi import utils
 from flask_yoloapi.types import ANY
 
+# Python 2 and 3 support
 SUPPORTED_TYPES = (bool, list, dict, datetime, type(None), ANY)
 if sys.version_info >= (3, 0):
     NUMERIC_TYPES = (int, float)
     STRING_LIKE = (str,)
-
-    SUPPORTED_TYPES += STRING_LIKE
-    SUPPORTED_TYPES += NUMERIC_TYPES
 else:
     STRING_LIKE = (unicode, str)
     NUMERIC_TYPES = (int, float, long)
 
-    SUPPORTED_TYPES += STRING_LIKE
-    SUPPORTED_TYPES += NUMERIC_TYPES
+SUPPORTED_TYPES += STRING_LIKE
+SUPPORTED_TYPES += NUMERIC_TYPES
 
 
 @utils.decorator_parametrized
@@ -61,7 +59,7 @@ def api(view_func, *parameters):
 
         for param in parameters:
             # checks if param is required
-            if param.key not in request_data:
+            if param.key not in request_data[param.location]:
                 if param.required:
                     return func_err(messages["required"] % param.key)
                 else:
@@ -80,7 +78,7 @@ def api(view_func, *parameters):
                     return func_err(messages["type_required_py3.5"] % param.key)
 
             # validate the param value
-            value = request_data.get(param.key)
+            value = request_data[param.location].get(param.key)
             if type(value) != param.type:
                 if param.type in NUMERIC_TYPES:
                     try:
@@ -131,7 +129,16 @@ def api(view_func, *parameters):
 
 
 class parameter:
-    def __init__(self, key, type=None, default=None, required=False, validator=None):
+    def __init__(self, key, type=None, default=None, required=False, validator=None, location='all'):
+        """
+        Endpoint parameter
+        :param key: The parameter name as a string
+        :param type: The parameter type
+        :param default: The default value this parameter should hold
+        :param required: Marks this parameter as 'required'
+        :param validator: A custom function that further validates the parameter
+        :param location: Location where to grab the parameter from. Can be any of: 'args', 'form', 'json'
+        """
         if not isinstance(key, STRING_LIKE):
             raise TypeError("bad type for 'key'; must be 'str'")
         if not isinstance(required, bool):
@@ -146,9 +153,12 @@ class parameter:
             raise TypeError("parameter default of type '%s' not supported" % str(type(default)))
         if validator is not None and not callable(validator):
             raise Exception("parameter 'validator' must be a function")
+        if location and location not in ['all', 'args', 'form', 'json']:
+            raise Exception("unknown location '%s'" % location)
 
         self.kwargs = {"validator": validator}
         self.default = default
+        self.location = location
         self.key = str(key)
         self.type = type
         self.type_annotations = None

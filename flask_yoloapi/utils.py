@@ -69,16 +69,18 @@ def get_request_data():
     """Very complicated and extensive algorithm
     to fetch incoming request data regardless
     of the type of request"""
-    data = {}
-    if request.args:
-        data = request.args
+    locations = ['args', 'form', 'json']
+    data = {k: {} for k in locations}
+    data['all'] = {}
 
-    if request.json:
-        for k, v in request.json.items():
-            data[k] = v
-    elif request.form:
-        for k, v in request.form.items():
-            data[k] = v
+    for location in locations:
+        _data = getattr(request, location)
+        if _data:
+            for k, v in _data.items():
+                data[location][k] = v
+                data['all'][k] = v
+        else:
+            data[location] = {}
     return data
 
 
