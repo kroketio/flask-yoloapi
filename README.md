@@ -46,6 +46,13 @@ Use cases
 In short, this is a simple library for simple JSON endpoints.
 
 
+Installation
+------------
+```sh
+pip install flask-yoloapi
+```
+
+
 ## Return values
 In the example above, a string was returned. The following types are also supported:
 
@@ -196,12 +203,6 @@ This library is rather opportunistic about gathering incoming parameters, as it 
 
 An optional `location` argument can be provided to specify the source of the parameter.
 
-The following 3 locations are supported:
-
-- `args` - GET parameters
-- `form` - parameters submitted via HTTP form submission
-- `json` - parameters submitted via a JSON encoded HTTP request
-
 ```python
 @app.route('/login')
 @endpoint.api(
@@ -211,6 +212,12 @@ The following 3 locations are supported:
 def login(username, password):
     return "Wrong password!", 403
 ```
+
+The following 3 locations are supported:
+
+- `args` - GET parameters
+- `form` - parameters submitted via HTTP form submission
+- `json` - parameters submitted via a JSON encoded HTTP request
 
 ## Datetime format
 
