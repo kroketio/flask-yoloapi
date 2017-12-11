@@ -168,7 +168,6 @@ Note that type annotations are only supported from Python 3.5 and upwards (PEP 4
 
 Additional parameter validation can be done by providing a validator function. This function takes 1 parameter; the input. 
 
-An `Exception` must be raised when the validation proves to be unsuccessful.
 
 ```python
 def custom_validator(value):
@@ -190,6 +189,11 @@ def hello(name, age):
     "data": "parameter 'age' error: you can't possibly be that old!"
 }
 ```
+
+When the validation proves to be unsuccessful, you may do 2 things:
+
+- Raise an `Exception`, it will automatically construct a JSON response. This is shown above.
+- Return a `Flask.Response` object, where you may construct your own HTTP response
 
 If you need more flexibility regarding incoming types use the `flask_yoloapi.types.ANY` type.
 

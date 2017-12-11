@@ -102,7 +102,13 @@ def api(view_func, *parameters):
             # validate via custom validator, if provided
             if param.kwargs.get('validator', None):
                 try:
-                    param.kwargs["validator"](value)
+                    result = param.kwargs["validator"](value)
+                    if isinstance(result, Response):
+                        return result
+                    elif result:
+                        raise Exception("validator returned an unknown format. " 
+                                        "either return nothing, raise an Exception or "
+                                        "return a `flask.Response` object.")
                 except Exception as ex:
                     return func_err("parameter '%s' error: %s" % (param.key, str(ex)))
 
@@ -110,7 +116,7 @@ def api(view_func, *parameters):
         try:
             result = view_func(*args, **kwargs)
         except Exception as ex:
-            return func_err("view function returned an error: %s" % str(ex))
+            return func_err(str(ex))
 
         if isinstance(result, Response):
             return result
