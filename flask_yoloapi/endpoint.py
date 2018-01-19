@@ -3,6 +3,7 @@ import inspect
 from functools import wraps
 from datetime import datetime
 
+import dateutil.parser
 from flask import jsonify, Response
 
 from flask_yoloapi import utils
@@ -89,6 +90,11 @@ def api(view_func, *parameters):
                     pass
                 elif param.type is ANY:
                     pass
+                elif param.type is datetime:
+                    try:
+                        value = dateutil.parser.parse(value)
+                    except:
+                        return func_err(messages["type_error"] % (param.key, param.type))
                 elif param.type is bool:
                     if value == 'y':
                         value = True

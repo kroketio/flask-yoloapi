@@ -2,7 +2,7 @@ import os
 from setuptools import setup, find_packages
 
 
-version = '0.0.7'
+version = '0.0.8'
 README = os.path.join(os.path.dirname(__file__), 'README.md')
 long_description = open(README).read()
 setup(
@@ -25,7 +25,8 @@ setup(
     author_email='sa.ferdinand@gmail.com',
     url='https://github.com/skftn/flask-yoloapi',
     install_requires=[
-        'flask'
+        'flask',
+        'python-dateutil'
     ],
     extra_requires=[
         'pytest'
