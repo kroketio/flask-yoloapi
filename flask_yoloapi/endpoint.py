@@ -59,6 +59,9 @@ def api(view_func, *parameters):
                                 if v.annotation is not inspect._empty}
 
         for param in parameters:
+            # normalize param key for the view_func(*args, **kwargs) call
+            param_key_safe = param.key.replace('-', '_')
+            
             # checks if param is required
             if param.key not in request_data[param.location]:
                 if param.required:
@@ -66,9 +69,9 @@ def api(view_func, *parameters):
                 else:
                     # set default value, if provided
                     if param.default is not None:
-                        kwargs[param.key] = param.default
+                        kwargs[param_key_safe] = param.default
                     else:
-                        kwargs[param.key] = None
+                        kwargs[param_key_safe] = None
                     continue
 
             # set the param type from function annotation (runs only once)
@@ -118,7 +121,8 @@ def api(view_func, *parameters):
                 except Exception as ex:
                     return func_err("parameter '%s' error: %s" % (param.key, str(ex)))
 
-            kwargs[param.key] = value
+            kwargs[param_key_safe] = value
+
         try:
             result = view_func(*args, **kwargs)
         except Exception as ex:
