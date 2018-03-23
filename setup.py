@@ -10,7 +10,7 @@ setup(
     version=version,
     description='Simply the best Flask API library',
     long_description=long_description,
-    long_description_content_type='text/markdown'
+    long_description_content_type='text/markdown; charset=utf-8',
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Web Environment',
