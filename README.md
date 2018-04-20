@@ -285,7 +285,7 @@ This error response is also generated when endpoint requirements are not met.
 Tests
 -----
 
-```python
+```
 $ pytest --cov=flask_yoloapi tests
 =========================================== test session starts ============================================
 platform linux -- Python 3.5.3, pytest-3.1.3, py-1.5.2, pluggy-0.4.0
