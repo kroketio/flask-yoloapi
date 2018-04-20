@@ -2,7 +2,7 @@ import os
 from setuptools import setup, find_packages
 
 
-version = '0.1.1'
+version = '0.1.2'
 README = os.path.join(os.path.dirname(__file__), 'README.md')
 long_description = open(README).read()
 setup(
@@ -10,7 +10,7 @@ setup(
     version=version,
     description='Simply the best Flask API library',
     long_description=long_description,
-    long_description_content_type='text/markdown; charset=utf-8',
+    long_description_content_type='text/markdown',
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Web Environment',
