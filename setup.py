@@ -2,7 +2,7 @@ import os
 from setuptools import setup, find_packages
 
 
-version = '0.1.2'
+version = '0.1.3'
 README = os.path.join(os.path.dirname(__file__), 'README.md')
 long_description = open(README).read()
 setup(
@@ -34,6 +34,7 @@ setup(
         'pytest-flask',
         'pytest-cov'
     ],
+    setup_requires=['setuptools>=38.6.0'],
     download_url=
         'https://github.com/skftn/flask-yoloapi/archive/master.zip',
     packages=find_packages(),
