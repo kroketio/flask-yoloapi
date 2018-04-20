@@ -2,7 +2,7 @@ import os
 from setuptools import setup, find_packages
 
 
-version = '0.0.9'
+version = '0.1.0'
 README = os.path.join(os.path.dirname(__file__), 'README.md')
 long_description = open(README).read()
 setup(
@@ -19,7 +19,7 @@ setup(
         'Operating System :: OS Independent',
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Topic :: Utilities',
-        'Programming Language :: Python :: 2'
+        'Programming Language :: Python'
     ],
     keywords='flask api flapi yoloapi',
     author='Sander Ferdinand',
@@ -30,7 +30,9 @@ setup(
         'python-dateutil'
     ],
     extra_requires=[
-        'pytest'
+        'pytest',
+        'pytest-flask',
+        'pytest-cov'
     ],
     download_url=
         'https://github.com/skftn/flask-yoloapi/archive/master.zip',

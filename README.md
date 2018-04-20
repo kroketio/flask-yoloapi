@@ -2,48 +2,62 @@
 
 ![whoop](https://i.imgur.com/xVS3UGq.png)
 
-A small framework for creating simple JSON endpoints.
+A simple library for simple JSON endpoints. YOLO!
 
 Example
 -------
 
+#### GET
+
 ```python
 from flask_yoloapi import endpoint, parameter
 
-@app.route('/api/login', methods=['GET', 'POST'])
+@app.route('/api/hello')
 @endpoint.api(
-    parameter('username', type=str, required=True),
-    parameter('password', type=str, required=True),
-    parameter('remember', type=bool, required=False, default=False)
+    parameter('name', type=str, required=True)
 )
-def login(username, password, remember):
-    """
-    Logs the user in.
-    :param username: The username of the user
-    :param password: The password of the user
-    :param expiration: Session expiration time in seconds
-    :return: The logged in message!
-    """
-    return "user logged in!"
+def api_hello(name):
+    return "Hello %s!" % name
 ```
 
-The response:
+`http://localhost:5000/api/hello?name=Sander`
 
 ```javascript
 {
-    data: "user logged in!"
+    data: "Hello Sander!"
 }
 ```
+
+#### POST
+
+```python
+from flask_yoloapi import endpoint, parameter
+
+@app.route('/api/hello', methods=['POST'])
+@endpoint.api(
+    parameter('name', type=str, required=True),
+    parameter('age', type=int, default=18)
+)
+def api_hello(name, age):
+    return "Hello %s, your age is %d" % (name, age)
+```
+
+`curl -H "Content-Type: application/json" -vvXPOST -d '{"name":"Sander"}' http://localhost:5000/api/hello`
+
+```javascript
+{
+    data: "Hello Sander, your age is 18"
+}
+```
+
 
 Use cases
 -------------
 
-- You don't want to write boilerplate code that involves classes just to make some API routes (flask-restful).
-- You don't want to fish incoming parameters out of `request.args`, or wait, was it `request.form`? No, `request.json` :sleeping:
+- No boilerplate code that involves classes to make API routes.
+- You don't want to fish incoming parameters out of `request.args` / `request.form` / `request.json` :sleeping:
 - You don't need to hook your endpoints directly to SQLa models.
 - You don't care about providing REST compliancy - you just want somewhat consistent JSON endpoints, damnit!
-
-In short, this is a simple library for simple JSON endpoints.
 
 
 Installation
@@ -268,6 +282,31 @@ This error response is also generated when endpoint requirements are not met.
         ...
 ```
 
+Tests
+-----
+
+```python
+$ pytest --cov=flask_yoloapi tests
+=========================================== test session starts ============================================
+platform linux -- Python 3.5.3, pytest-3.1.3, py-1.5.2, pluggy-0.4.0
+rootdir: /home/dsc/flask-yoloapi, inifile:
+plugins: flask-0.10.0, cov-2.5.1
+collected 19 items 
+
+tests/test_app.py ...................
+
+----------- coverage: platform linux, python 3.5.3-final-0 -----------
+Name                          Stmts   Miss  Cover
+-------------------------------------------------
+flask_yoloapi/__init__.py         2      0   100%
+flask_yoloapi/endpoint.py       111      4    96%
+flask_yoloapi/exceptions.py       3      1    67%
+flask_yoloapi/types.py            5      2    60%
+flask_yoloapi/utils.py           52      5    90%
+-------------------------------------------------
+TOTAL                           173     12    93%
+
+```
 
 License
 -------------

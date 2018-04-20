@@ -32,6 +32,8 @@ def api(view_func, *parameters):
         "type_required_py3.5": "no type specified for parameter '%s', "
                                "specify a type argument or use "
                                "type annotations (PEP 484)",
+        "datetime_parse_error": "datetime '%s' could not be parsed using "
+                                "dateutil.parser(\"%s\")",
         "bad_return": "view function returned unsupported type '%s'",
         "bad_return_tuple": "when returning tuples, the first index "
                             "must be an object of any supported "
@@ -97,11 +99,11 @@ def api(view_func, *parameters):
                     try:
                         value = dateutil.parser.parse(value)
                     except:
-                        return func_err(messages["type_error"] % (param.key, param.type))
-                elif param.type is bool:
-                    if value == 'y':
+                        return func_err(messages["datetime_parse_error"] % (param.key, str(value)))
+                elif param.type is bool and type(value) in STRING_LIKE:
+                    if value.lower() in ('true', 'y'):
                         value = True
-                    elif value == 'n':
+                    elif value.lower() in ('false', 'n'):
                         value = False
                     else:
                         return func_err(messages["type_error"] % (param.key, param.type))
@@ -168,9 +170,9 @@ class parameter:
         if default is not None and default.__class__ not in SUPPORTED_TYPES:
             raise TypeError("parameter default of type '%s' not supported" % str(type(default)))
         if validator is not None and not callable(validator):
-            raise Exception("parameter 'validator' must be a function")
+            raise TypeError("parameter 'validator' must be a function")
         if location and location not in ['all', 'args', 'form', 'json']:
-            raise Exception("unknown location '%s'" % location)
+            raise ValueError("unknown location '%s'" % location)
 
         self.kwargs = {"validator": validator}
         self.default = default
