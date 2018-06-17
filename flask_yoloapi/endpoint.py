@@ -5,6 +5,7 @@ from datetime import datetime
 
 import dateutil.parser
 from flask import jsonify, Response
+from werkzeug.wrappers import Response as WResponse
 
 from flask_yoloapi import utils
 from flask_yoloapi.types import ANY
@@ -130,7 +131,7 @@ def api(view_func, *parameters):
         except Exception as ex:
             return func_err(str(ex))
 
-        if isinstance(result, Response):
+        if isinstance(result, (Response, WResponse)):
             return result
         elif result is None:
             return jsonify(data=None), 204
