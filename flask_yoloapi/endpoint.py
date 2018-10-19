@@ -5,6 +5,7 @@ from datetime import datetime
 
 import dateutil.parser
 from flask import jsonify, Response
+from werkzeug.exceptions import HTTPException
 from werkzeug.wrappers import Response as WResponse
 
 from flask_yoloapi import utils
@@ -128,6 +129,8 @@ def api(view_func, *parameters):
 
         try:
             result = view_func(*args, **kwargs)
+        except HTTPException:
+            raise
         except Exception as ex:
             return func_err(str(ex))
 
