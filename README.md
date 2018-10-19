@@ -282,6 +282,12 @@ This error response is also generated when endpoint requirements are not met.
         ...
 ```
 
+Contributors
+-----
+
+- dromer
+- iksteen
+
 Tests
 -----
 
