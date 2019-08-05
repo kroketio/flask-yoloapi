@@ -1,5 +1,6 @@
 import sys
 import inspect
+import logging
 from functools import wraps
 from datetime import datetime
 
@@ -10,6 +11,8 @@ from werkzeug.wrappers import Response as WResponse
 
 from flask_yoloapi import utils
 from flask_yoloapi.types import ANY
+
+logger = logging.getLogger(__name__)
 
 # Python 2 and 3 support
 SUPPORTED_TYPES = (bool, list, dict, datetime, type(None), ANY)
@@ -43,10 +46,16 @@ def api(view_func, *parameters):
                             "HTTP return status code as an integer"
     }
 
-    func_err = lambda ex, http_status=500: (jsonify(
-        data=str(ex),
-        docstring=utils.docstring(view_func, *parameters)
-    ), http_status)
+    def func_err(message, http_status=500):
+        if 500 <= http_status < 600:
+            logger.exception(message)
+        else:
+            logger.error(message)
+
+        return jsonify(
+            data=message,
+            docstring=utils.docstring(view_func, *parameters)
+        ), http_status
 
     @wraps(view_func)
     def validate_and_execute(*args, **kwargs):
